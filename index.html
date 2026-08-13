@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electric Border</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --electric-border-color: oklch(0.65 0.19 295);
+      --electric-light-color: oklch(from var(--electric-border-color) calc(l + 0.06) calc(c * 0.75) h);
+      --electric-border-muted: oklch(from var(--electric-border-color) l c h / 0.45);
+      --electric-border-soft: oklch(from var(--electric-border-color) l c h / 0.55);
+      --gradient-color: oklch(
+        from var(--electric-border-color) 0.3 calc(c / 2) h / 0.4
+      );
+      --color-neutral-900: oklch(0.17 0.02 285);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Bricolage Grotesque", sans-serif;
+      background-color: oklch(0.11 0.025 285);
+      color: oklch(0.985 0 0);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .filter-svg {
+      position: absolute;
+    }
+
+    .card {
+      padding: 2px;
+      border-radius: 24px;
+      position: relative;
+      cursor: pointer;
+      background: linear-gradient(
+          -30deg,
+          var(--gradient-color),
+          transparent,
+          var(--gradient-color)
+        ),
+        linear-gradient(
+          to bottom,
+          var(--color-neutral-900),
+          var(--color-neutral-900)
+        );
+    }
+
+    .stack {
+      position: relative;
+    }
+
+    .frame {
+      border: 2px solid var(--electric-border-muted);
+      border-radius: 24px;
+    }
+
+    .wire {
+      width: 350px;
+      height: 500px;
+      border-radius: 24px;
+      border: 2px solid var(--electric-border-color);
+      filter: url(#turbulent-displace);
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    .wire::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(to bottom, var(--electric-border-color), transparent);
+      opacity: 0;
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+
+    .card:hover .wire::before {
+      opacity: 1;
+    }
+
+    .glow-sm {
+      border: 2px solid var(--electric-border-soft);
+      border-radius: 24px;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      filter: blur(1px);
+    }
+
+    .glow-lg {
+      border: 2px solid var(--electric-light-color);
+      border-radius: 24px;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      filter: blur(4px);
+    }
+
+    .shine {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 24px;
+      opacity: 1;
+      mix-blend-mode: overlay;
+      transform: scale(1.1);
+      filter: blur(16px);
+      background: linear-gradient(
+        -30deg,
+        white,
+        transparent 30%,
+        transparent 70%,
+        white
+      );
+    }
+
+    .shine-soft {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 24px;
+      opacity: 0.5;
+      mix-blend-mode: overlay;
+      transform: scale(1.1);
+      filter: blur(16px);
+      background: linear-gradient(
+        -30deg,
+        white,
+        transparent 30%,
+        transparent 70%,
+        white
+      );
+    }
+
+    .aura {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 24px;
+      filter: blur(32px);
+      transform: scale(1.1);
+      opacity: 0.3;
+      z-index: -1;
+      background: linear-gradient(
+        -30deg,
+        var(--electric-light-color),
+        transparent,
+        var(--electric-border-color)
+      );
+    }
+
+    .copy {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top {
+      display: flex;
+      flex-direction: column;
+      padding: 36px;
+      padding-bottom: 12px;
+      height: 100%;
+    }
+
+    .bottom {
+      display: flex;
+      flex-direction: column;
+      padding: 36px;
+      padding-top: 12px;
+    }
+
+    .pill {
+      background: radial-gradient(
+          47.2% 50% at 50.39% 88.37%,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0) 100%
+        ),
+        rgba(255, 255, 255, 0.04);
+      position: relative;
+      transition: background 0.3s ease;
+      border-radius: 14px;
+      width: fit-content;
+      height: fit-content;
+      padding: 8px 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .pill:hover {
+      background: radial-gradient(
+          47.2% 50% at 50.39% 88.37%,
+          rgba(255, 255, 255, 0.12) 0%,
+          rgba(255, 255, 255, 0) 100%
+        ),
+        rgba(255, 255, 255, 0.08);
+    }
+
+    .pill::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1px;
+      background: linear-gradient(
+        150deg,
+        rgba(255, 255, 255, 0.48) 16.73%,
+        rgba(255, 255, 255, 0.08) 30.2%,
+        rgba(255, 255, 255, 0.08) 68.2%,
+        rgba(255, 255, 255, 0.6) 81.89%
+      );
+      border-radius: inherit;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: xor;
+      -webkit-mask-composite: xor;
+      pointer-events: none;
+    }
+
+    .heading {
+      font-size: 26px;
+      font-weight: 600;
+      margin-top: auto;
+      letter-spacing: -0.02em;
+    }
+
+    .text {
+      font-size: 13px;
+      line-height: 1.55;
+      opacity: 0.45;
+      font-weight: 400;
+    }
+
+    .rule {
+      margin-top: auto;
+      border: none;
+      height: 1px;
+      background-color: currentColor;
+      opacity: 0.5;
+      mask-image: linear-gradient(to right, transparent, black, transparent);
+      -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        black,
+        transparent
+      );
+    }
+  </style>
+</head>
+<body>
+  <main>
+
+    <svg class="filter-svg" aria-hidden="true">
+      <defs>
+        <filter id="turbulent-displace"  x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="1" />
+          <feOffset in="noise1" dx="0" dy="0" result="offsetNoise1">
+            <animate attributeName="dy" values="700; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+          </feOffset>
+
+          <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="1" />
+          <feOffset in="noise2" dx="0" dy="0" result="offsetNoise2">
+            <animate attributeName="dy" values="0; -700" dur="6s" repeatCount="indefinite" calcMode="linear" />
+          </feOffset>
+
+          <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise1" seed="2" />
+          <feOffset in="noise1" dx="0" dy="0" result="offsetNoise3">
+            <animate attributeName="dx" values="490; 0" dur="6s" repeatCount="indefinite" calcMode="linear" />
+          </feOffset>
+
+          <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="10" result="noise2" seed="2" />
+          <feOffset in="noise2" dx="0" dy="0" result="offsetNoise4">
+            <animate attributeName="dx" values="0; -490" dur="6s" repeatCount="indefinite" calcMode="linear" />
+          </feOffset>
+
+          <feComposite in="offsetNoise1" in2="offsetNoise2" result="yMove" />
+          <feComposite in="offsetNoise3" in2="offsetNoise4" result="xMove" />
+          <feBlend in="yMove" in2="xMove" mode="color-dodge" result="result" />
+
+          <feDisplacementMap in="SourceGraphic" in2="result" scale="50"/>
+        </filter>
+      </defs>
+    </svg>
+    <div class="card">
+      <div class="stack">
+        <div class="frame">
+          <div class="wire"></div>
+        </div>
+        <div class="glow-sm"></div>
+        <div class="glow-lg"></div>
+      </div>
+
+      <div class="shine"></div>
+      <div class="shine-soft"></div>
+      <div class="aura"></div>
+
+      <div class="copy">
+        <div class="top">
+          <div class="pill">
+            Purple
+          </div>
+          <p class="heading">Neon Pulse</p>
+        </div>
+
+        <hr class="rule" />
+
+        <div class="bottom">
+          <p class="text">The border hums with energy. Hover to charge it up.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
